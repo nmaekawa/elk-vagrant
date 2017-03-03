@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+INSTANCE_IP = "10.10.10.20"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+    #config.vm.box = "ubuntu/xenial64"
+    config.vm.box = "bento/ubuntu-16.04"
+    config.vm.network "private_network", ip: INSTANCE_IP
+    config.vm.network "forwarded_port", guest: 9200, host: 9200  # es
+    config.vm.network "forwarded_port", guest: 5601, host: 5601  # kibana
+
+    # Provider-specific configuration so you can fine-tune various
+    # backing providers for Vagrant. These expose provider-specific options.
+    config.vm.provider "virtualbox" do |v|
+        v.memory = "4096"
+        #v.gui = true
+    end
+
+    # to prevent tty errors executing shell provisioner
+    config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+    # ansible user for provisioning
+    config.vm.provision "shell" do |s|
+        s.args = [INSTANCE_IP]
+        s.path = "./elk_setup.sh"
+    end
+
+end
