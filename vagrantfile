@@ -25,7 +25,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # ansible user for provisioning
     config.vm.provision "shell" do |s|
-        s.args = [INSTANCE_IP]
+        s.env = {
+            "LOCALHOST_IP": INSTANCE_IP,
+            "ES_2": "true",  # remove if you want es5
+        }
         s.path = "./elk_setup.sh"
     end
 
